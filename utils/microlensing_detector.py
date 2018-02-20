@@ -26,6 +26,44 @@ class DetectMicrolensingEvents(object):
         self.variability_threshold = 3.  # the threshold to class something as variable
         self.size_threshold = 3.
 
+    def detect_events(self, large_data):
+        """ Run through the microlensing pipeline and try and fine microlensing events. Record how many objects pass
+        each cut.
+
+        large_data --- a dictionary with object IDs as keys, and the object ID keys point to dictionaries that
+        contain the observations.
+
+        """
+
+        total_num_objs = len(large_data)
+
+        num_pass_first_cut = 0
+        num_pass_second_cut = 0
+        num_pass_third_cut = 0
+        num_pass_fourth_cut = 0
+
+        for key in large_data:
+            """ Iterate over every single object and see if it passes the microlensing cuts. """
+
+            object = large_data[key]
+
+            if self.variability_cut(object):
+                num_pass_first_cut += 1
+            else:
+                pass
+
+            if self.red_cut(object):
+                num_pass_second_cut += 1
+            else:
+                pass
+
+            if self.achromaticity_cut(object):
+                num_pass_third_cut += 1
+            else:
+                pass
+
+        return num_pass_fourth_cut
+
     def variability_cut(self, data):
         """ Very basic cut for now.. just see if the sum of the errors is much smaller than the variance of the
         observations.. """
@@ -50,13 +88,12 @@ class DetectMicrolensingEvents(object):
 
         return variable_bands > non_variable_bands
 
-    def vary_only_once_cut(self):
+    def vary_only_once_cut(self, data):
         """ For a single lens and source, the source should only appear to vary once.. """
-
 
         pass
 
-    def achromaticity_cut(self):
+    def achromaticity_cut(self, data):
         pass
 
     def red_cut(self, data):
