@@ -2,9 +2,10 @@ import numpy as np
 import astropy.constants as const
 from utils.loaddata import load_csv_data
 import matplotlib.pyplot as plt
+import utils.microlensing_model as mm
 
 
-class GenerateMicrolensingEvent(object):
+class GenerateMicrolensingEvents(object):
     """This class will generate a random microlensing event for every item in a dictionary of lightcurves.
      All of the parameters are randomly generated, over a default or specified range."""
 
@@ -20,30 +21,6 @@ class GenerateMicrolensingEvent(object):
 
     def get_u_min(self):
         return np.random.uniform(self.u_min_min, self.u_min_max)
-
-    def get_u(self, t, t_hat, u_min, t_max):
-        u = np.sqrt(u_min ** 2 + ((t - t_max) / t_hat) ** 2)
-        return u
-
-    def get_amplification(self, t, t_hat, u_min, t_max):
-        u = self.get_u(t, t_hat, u_min, t_max)
-        return (u**2 + 2.)/(u*np.sqrt(u**2 + 4))
-
-    def get_delta_mag(self, t, t_hat, u_min, t_max):  # change in the magnitude of the star due to the lensing
-        u = self.get_u(t, t_hat, u_min, t_max)
-        A = (u ** 2 + 2) / (u * np.sqrt(u ** 2 + 4))
-        delta_mag = 2.5 * np.log10(A)
-        return delta_mag
-
-    def mag_to_flux(self, mag):
-        m_vega = -21.10
-        flux = 10**((m_vega - mag)/2.5)
-        return flux
-
-    def flux_to_mag(self, flux):
-        m_vega = -21.10
-        mag = -2.5*np.log10(flux) + m_vega
-        return mag
 
     def generate_microlensing_catalogue(self, data, t_hat):
         """ Return a catalogue of lightcurves with microlensing events implanted into them.
@@ -83,13 +60,13 @@ class GenerateMicrolensingEvent(object):
 
                     obs_time -= 56255.09246  # the time of the first observation
 
-                    obs_flux = self.mag_to_flux(obs_mag)
+                    obs_flux = mm.mag_to_flux(obs_mag)
 
-                    A = self.get_amplification(obs_time, t_hat, tmp_u_min, tmp_t_max)
+                    A = mm.get_amplification(obs_time, t_hat, tmp_u_min, tmp_t_max)
 
                     flux_sim = obs_flux + (A - 1.)*np.median(obs_flux)
 
-                    mag_sim = self.flux_to_mag(flux_sim)
+                    mag_sim = mm.flux_to_mag(flux_sim)
 
                     tmp_dict[colour + '_obs_time'] = obs_time
                     tmp_dict[colour + '_mag_err'] = obs_mag_err
@@ -112,7 +89,7 @@ class GenerateMicrolensingEvent(object):
 
 data = load_csv_data('data/high_nepochs_objects.csv')
 
-gme = GenerateMicrolensingEvent()
+gme = GenerateMicrolensingEvents()
 
 ml_dicts = gme.generate_microlensing_catalogue(data, 300.)
 
