@@ -25,9 +25,13 @@ def load_csv_data(filepath):
     for i in range(0, len(csv_data)):
         tmp_row = csv_data[i]
 
+        print(tmp_row)
+
         # if tmp_row[3] == 99 or tmp_row[4] == 99:
 
         if tmp_row[0] == tmp_key:
+            print(tmp_row[0])
+            print(tmp_row[1])
             if tmp_row[1]+'_mag_obs' in tmp_dict:
                 tmp_dict[tmp_row[1] + '_mag_obs'] = np.append(tmp_dict[tmp_row[1] + '_mag_obs'], tmp_row[3])
                 tmp_dict[tmp_row[1] + '_mag_err'] = np.append(tmp_dict[tmp_row[1] + '_mag_err'], tmp_row[4])
